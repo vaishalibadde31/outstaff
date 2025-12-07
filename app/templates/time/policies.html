@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-sm uppercase tracking-wide text-brand-700 font-semibold">Policies & Locks</p>
+      <h1 class="text-3xl font-bold">{{ org.name }}</h1>
+      <p class="text-slate-600">Set workweek defaults, overtime thresholds, lock periods, and holidays.</p>
+    </div>
+    <a class="btn btn-secondary" href="{{ url_for('time.dashboard', org_id=org.id) }}">Dashboard</a>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 card p-6 space-y-3">
+      <h2 class="text-xl font-semibold">Policies</h2>
+      <form method="POST" class="space-y-3">
+        {{ policy_form.hidden_tag() }}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="space-y-2">
+            {{ policy_form.workweek.label }}
+            {{ policy_form.workweek(class_="w-full") }}
+          </div>
+          <div class="space-y-2">
+            {{ policy_form.require_project.label }}
+            {{ policy_form.require_project() }}
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="space-y-2">
+            {{ policy_form.max_daily_hours.label }}
+            {{ policy_form.max_daily_hours(class_="w-full") }}
+          </div>
+          <div class="space-y-2">
+            {{ policy_form.max_weekly_hours.label }}
+            {{ policy_form.max_weekly_hours(class_="w-full") }}
+          </div>
+          <div class="space-y-2">
+            {{ policy_form.require_break_minutes.label }}
+            {{ policy_form.require_break_minutes(class_="w-full") }}
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="space-y-2">
+            {{ policy_form.overtime_daily_threshold.label }}
+            {{ policy_form.overtime_daily_threshold(class_="w-full") }}
+          </div>
+          <div class="space-y-2">
+            {{ policy_form.overtime_weekly_threshold.label }}
+            {{ policy_form.overtime_weekly_threshold(class_="w-full") }}
+          </div>
+          <div class="space-y-2">
+            {{ policy_form.lock_after_days.label }}
+            {{ policy_form.lock_after_days(class_="w-full") }}
+          </div>
+        </div>
+        <button class="btn btn-primary" type="submit">{{ policy_form.submit.label.text }}</button>
+      </form>
+    </div>
+
+    <div class="card p-6 space-y-4">
+      <h2 class="text-xl font-semibold">Period locks</h2>
+      <form method="POST" class="space-y-3">
+        {{ lock_form.hidden_tag() }}
+        <input type="hidden" name="lock" value="1">
+        <div class="space-y-2">
+          {{ lock_form.start_date.label }}
+          {{ lock_form.start_date(class_="w-full") }}
+        </div>
+        <div class="space-y-2">
+          {{ lock_form.end_date.label }}
+          {{ lock_form.end_date(class_="w-full") }}
+        </div>
+        <div class="space-y-2">
+          {{ lock_form.reason.label }}
+          {{ lock_form.reason(class_="w-full") }}
+        </div>
+        <button class="btn btn-secondary w-full" type="submit">{{ lock_form.submit.label.text }}</button>
+      </form>
+      <div class="space-y-2">
+        {% for lock in locks %}
+        <div class="border border-slate-100 rounded-lg px-3 py-2 text-sm text-slate-700">
+          {{ lock.start_date }} → {{ lock.end_date }} • {{ lock.reason or 'Locked' }}
+        </div>
+        {% else %}
+        <p class="text-slate-600 text-sm">No locked periods.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-6 space-y-3">
+    <h2 class="text-xl font-semibold">Holidays</h2>
+    <form method="POST" class="space-y-3">
+      {{ holiday_form.hidden_tag() }}
+      <input type="hidden" name="holiday" value="1">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="space-y-2">
+          {{ holiday_form.date.label }}
+          {{ holiday_form.date(class_="w-full") }}
+        </div>
+        <div class="space-y-2">
+          {{ holiday_form.name.label }}
+          {{ holiday_form.name(class_="w-full") }}
+        </div>
+        <div class="space-y-2">
+          {{ holiday_form.region.label }}
+          {{ holiday_form.region(class_="w-full") }}
+        </div>
+      </div>
+      <button class="btn btn-primary" type="submit">{{ holiday_form.submit.label.text }}</button>
+    </form>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      {% for holiday in holidays %}
+      <div class="border border-slate-100 rounded-lg px-3 py-2 text-sm text-slate-700">
+        {{ holiday.date }} • {{ holiday.name }} {% if holiday.region %}({{ holiday.region }}){% endif %}
+      </div>
+      {% else %}
+      <p class="text-slate-600 text-sm">No holidays configured.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

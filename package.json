@@ -1,0 +1,12 @@
+{
+  "name": "outstaff",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./assets/input.css -o ./app/static/css/tailwind.css --minify",
+    "watch:css": "tailwindcss -i ./assets/input.css -o ./app/static/css/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.5"
+  }
+}

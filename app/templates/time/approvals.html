@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-sm uppercase tracking-wide text-brand-700 font-semibold">Approvals</p>
+      <h1 class="text-3xl font-bold">{{ org.name }}</h1>
+      <p class="text-slate-600">Review submitted entries. Approve or return with a comment.</p>
+    </div>
+    <a class="btn btn-secondary" href="{{ url_for('time.dashboard', org_id=org.id) }}">Dashboard</a>
+  </div>
+
+  <div class="card p-6 space-y-3">
+    <div class="flex items-center justify-between">
+      <h2 class="text-xl font-semibold">Pending ({{ entries|length }})</h2>
+    </div>
+    <div class="space-y-3">
+      {% for entry in entries %}
+      <div class="border border-slate-100 rounded-xl px-4 py-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="font-semibold text-slate-900">{{ entry.user.name }} • {{ entry.project.name if entry.project else "General" }}</p>
+            <p class="text-sm text-slate-600">{{ entry.date }} • {{ entry.start_at.strftime('%H:%M') }} → {{ entry.end_at.strftime('%H:%M') }} • {{ (entry.duration_minutes/60)|round(2) }}h</p>
+            {% if entry.notes %}<p class="text-sm text-slate-600">{{ entry.notes }}</p>{% endif %}
+          </div>
+          <span class="badge">{{ entry.status.value|capitalize }}</span>
+        </div>
+        <div class="mt-3 space-y-2">
+          <form method="POST" action="{{ url_for('time.approve_entry', org_id=org.id, entry_id=entry.id) }}">
+            {{ decision_form.hidden_tag() }}
+            <textarea name="comment" class="w-full border border-slate-200 rounded-lg px-3 py-2" placeholder="Optional comment"></textarea>
+            <div class="mt-2 flex items-center gap-2">
+              <button class="btn btn-primary" type="submit">Approve</button>
+            </div>
+          </form>
+          <form method="POST" action="{{ url_for('time.return_entry', org_id=org.id, entry_id=entry.id) }}">
+            {{ decision_form.hidden_tag() }}
+            <textarea name="comment" class="w-full border border-slate-200 rounded-lg px-3 py-2" placeholder="Return reason"></textarea>
+            <div class="mt-2 flex items-center gap-2">
+              <button class="btn bg-amber-50 text-amber-800 hover:bg-amber-100" type="submit">Return</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      {% else %}
+      <p class="text-slate-600">No submitted entries.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

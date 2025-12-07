@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-sm uppercase tracking-wide text-brand-700 font-semibold">Edit time entry</p>
+      <h1 class="text-2xl font-bold">{{ org.name }}</h1>
+      <p class="text-slate-600">Adjust timings and details. Overlaps are blocked.</p>
+    </div>
+    <a class="btn btn-secondary" href="{{ url_for('time.my_time', org_id=org.id) }}">Back</a>
+  </div>
+  <form method="POST" class="card p-6 space-y-3">
+    {{ form.hidden_tag() }}
+    <div class="space-y-2">
+      {{ form.date.label }}
+      {{ form.date(class_="w-full") }}
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div class="space-y-2">
+        {{ form.project_id.label }}
+        {{ form.project_id(class_="w-full") }}
+      </div>
+      <div class="space-y-2">
+        {{ form.activity_id.label }}
+        {{ form.activity_id(class_="w-full") }}
+      </div>
+    </div>
+    <div class="space-y-2">
+      {{ form.start_at.label }}
+      {{ form.start_at(class_="w-full") }}
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div class="space-y-2">
+        {{ form.end_at.label }}
+        {{ form.end_at(class_="w-full") }}
+      </div>
+      <div class="space-y-2">
+        {{ form.status.label }}
+        {{ form.status(class_="w-full") }}
+      </div>
+    </div>
+    <div class="space-y-2">
+      {{ form.billable.label }}
+      {{ form.billable() }}
+    </div>
+    <div class="space-y-2">
+      {{ form.tags.label }}
+      {{ form.tags(class_="w-full") }}
+    </div>
+    <div class="space-y-2">
+      {{ form.notes.label }}
+      {{ form.notes(class_="w-full") }}
+    </div>
+    <button class="btn btn-primary" type="submit">{{ form.submit.label.text }}</button>
+  </form>
+</div>
+{% endblock %}

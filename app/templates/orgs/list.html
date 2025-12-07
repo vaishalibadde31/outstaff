@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <p class="text-sm uppercase tracking-wide text-brand-700 font-semibold">Organizations</p>
+    <h1 class="text-3xl font-bold">Your workspaces</h1>
+    <p class="text-slate-600">Create and manage multiple organizations. Switch contexts effortlessly.</p>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('orgs.create_org') }}">New organization</a>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  {% for membership in memberships %}
+  <div class="card p-4 flex flex-col gap-2">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-lg font-semibold">{{ membership.organization.name }}</p>
+        <p class="text-sm text-slate-500">{{ membership.organization.slug }} • {{ membership.organization.timezone }}</p>
+      </div>
+      <span class="badge">{{ membership.role.value|capitalize }}</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <form method="POST" action="{{ url_for('orgs.set_default_org', org_id=membership.organization.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-secondary" type="submit">
+          {% if membership.is_default %}Default{% else %}Set default{% endif %}
+        </button>
+      </form>
+      <a class="btn btn-primary" href="{{ url_for('orgs.view_org', org_id=membership.organization.id) }}">Open</a>
+    </div>
+  </div>
+  {% else %}
+  <div class="card p-4">
+    <p class="text-slate-700">No organizations yet. Create your first one to begin.</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

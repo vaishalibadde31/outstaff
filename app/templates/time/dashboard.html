@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-sm uppercase tracking-wide text-brand-700 font-semibold">Time</p>
+      <h1 class="text-3xl font-bold">{{ org.name }} time dashboard</h1>
+      <p class="text-slate-600">Quick view of your week, pending approvals, and recent activity.</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <a class="btn btn-primary" href="{{ url_for('time.my_time', org_id=org.id) }}">Log time</a>
+      {% if membership.role == Role.ADMIN %}
+      <a class="btn btn-secondary" href="{{ url_for('time.approvals', org_id=org.id) }}">Approvals</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card p-4 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3">
+    <a class="btn btn-secondary w-full text-center" href="{{ url_for('time.my_time', org_id=org.id) }}">My time</a>
+    <a class="btn btn-secondary w-full text-center" href="{{ url_for('time.reports', org_id=org.id) }}">Reports</a>
+    {% if membership.role == Role.ADMIN %}
+    <a class="btn btn-secondary w-full text-center" href="{{ url_for('time.approvals', org_id=org.id) }}">Approvals</a>
+    <a class="btn btn-secondary w-full text-center" href="{{ url_for('time.projects', org_id=org.id) }}">Projects & activities</a>
+    <a class="btn btn-secondary w-full text-center" href="{{ url_for('time.policies', org_id=org.id) }}">Policies & locks</a>
+    {% endif %}
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="card p-4">
+      <p class="text-sm text-slate-600">My hours this week</p>
+      <p class="text-3xl font-bold text-brand-700">{{ (week_total / 60)|round(1) }}h</p>
+      <p class="text-xs text-slate-500">Rolling Mon-Sun</p>
+    </div>
+    <div class="card p-4">
+      <p class="text-sm text-slate-600">Org hours this week</p>
+      <p class="text-3xl font-bold text-slate-900">{{ (org_week_total / 60)|round(1) }}h</p>
+      <p class="text-xs text-slate-500">All members</p>
+    </div>
+    <div class="card p-4">
+      <p class="text-sm text-slate-600">Pending approvals</p>
+      <p class="text-3xl font-bold text-amber-600">{{ pending_approvals|length }}</p>
+      <p class="text-xs text-slate-500">Submitted entries awaiting review</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="card p-6">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-xl font-semibold">My recent entries</h2>
+        <a class="text-sm text-brand-700" href="{{ url_for('time.my_time', org_id=org.id) }}">View all</a>
+      </div>
+      <div class="space-y-2">
+        {% for entry in recent_entries %}
+        <div class="border border-slate-100 rounded-lg px-4 py-3 flex items-center justify-between">
+          <div>
+            <p class="font-semibold text-slate-900">{{ entry.project.name if entry.project else "General" }}</p>
+            <p class="text-sm text-slate-600">{{ entry.start_at.strftime('%Y-%m-%d %H:%M') }} → {{ entry.end_at.strftime('%H:%M') }}</p>
+          </div>
+          <span class="badge">{{ entry.status.value|capitalize }}</span>
+        </div>
+        {% else %}
+        <p class="text-slate-600 text-sm">No entries yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card p-6">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-xl font-semibold">Approvals queue</h2>
+        {% if membership.role == Role.ADMIN %}
+        <a class="text-sm text-brand-700" href="{{ url_for('time.approvals', org_id=org.id) }}">Manage</a>
+        {% endif %}
+      </div>
+      <div class="space-y-2">
+        {% for entry in pending_approvals %}
+        <div class="border border-slate-100 rounded-lg px-4 py-3">
+          <p class="font-semibold text-slate-900">{{ entry.user.name }}</p>
+          <p class="text-sm text-slate-600">{{ entry.project.name if entry.project else "General" }} • {{ entry.start_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        </div>
+        {% else %}
+        <p class="text-slate-600 text-sm">No pending approvals.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

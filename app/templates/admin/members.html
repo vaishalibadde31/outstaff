@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <div class="card p-6">
+    <p class="text-sm uppercase tracking-wide text-brand-700 font-semibold">Admin</p>
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold">{{ org.name }} admin console</h1>
+        <p class="text-slate-600">Add existing users, manage roles, and keep membership tidy.</p>
+      </div>
+      <a class="btn btn-secondary" href="{{ url_for('orgs.view_org', org_id=org.id) }}">Back to org</a>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 card p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold">Members</h2>
+        <span class="pill">{{ members|length }} active</span>
+      </div>
+      <div class="space-y-3">
+        {% for member in members %}
+        <div class="border border-slate-100 rounded-xl px-4 py-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="font-semibold text-slate-900">{{ member.user.name }}</p>
+              <p class="text-sm text-slate-600">{{ member.user.email }}</p>
+            </div>
+            <span class="badge">{{ member.role.value|capitalize }}</span>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-3 items-center">
+            <form method="POST" action="{{ url_for('admin.update_role', org_id=org.id, membership_id=member.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <select name="role" class="mr-2">
+                <option value="admin" {% if member.role.value=='admin' %}selected{% endif %}>Admin</option>
+                <option value="member" {% if member.role.value=='member' %}selected{% endif %}>Member</option>
+              </select>
+              <button class="btn btn-secondary" type="submit">Update role</button>
+            </form>
+            <form method="POST" action="{{ url_for('admin.remove_member', org_id=org.id, membership_id=member.id) }}" onsubmit="return confirm('Remove member?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="btn bg-rose-50 text-rose-700 hover:bg-rose-100" type="submit">Remove</button>
+            </form>
+          </div>
+        </div>
+        {% else %}
+        <p class="text-slate-600">No members yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <div class="card p-6 space-y-4">
+        <div>
+          <p class="text-sm uppercase tracking-wide text-brand-700 font-semibold">Invite</p>
+          <h2 class="text-xl font-semibold">Add existing users</h2>
+          <p class="text-sm text-slate-600">Lookup by email. Only already-registered users can be added.</p>
+        </div>
+        <form method="POST" class="space-y-3">
+          {{ invite_form.hidden_tag() }}
+          <div class="space-y-2">
+            {{ invite_form.email.label }}
+            {{ invite_form.email(class_="w-full") }}
+          </div>
+          <div class="space-y-2">
+            {{ invite_form.role.label }}
+            {{ invite_form.role(class_="w-full") }}
+          </div>
+          <button class="btn btn-primary w-full" type="submit">{{ invite_form.submit.label.text }}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
