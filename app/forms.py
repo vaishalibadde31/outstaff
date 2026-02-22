@@ -155,3 +155,8 @@ class ReportFilterForm(FlaskForm):
         validators=[Optional()],
     )
     submit = SubmitField("Run report")
+
+
+class NoteForm(FlaskForm):
+    content = TextAreaField("Content", validators=[DataRequired()])
+    submit = SubmitField("Add Note")

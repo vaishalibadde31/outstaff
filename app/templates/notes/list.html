@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto mt-8 space-y-6">
+
+  <!-- Header -->
+  <div class="card p-6">
+    <p class="text-sm uppercase tracking-wide text-brand-700 font-semibold">
+      Organization Notes
+    </p>
+    <h1 class="text-2xl font-bold mt-1">
+      {{ org.name }}
+    </h1>
+  </div>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="space-y-2">
+        {% for category, message in messages %}
+          <div class="p-3 rounded-lg 
+            {% if category == 'success' %} bg-green-100 text-green-800
+            {% elif category == 'warning' %} bg-yellow-100 text-yellow-800
+            {% elif category == 'info' %} bg-blue-100 text-blue-800
+            {% else %} bg-red-100 text-red-800
+            {% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Add Note Form -->
+  <div class="card p-6">
+    <h2 class="text-lg font-semibold mb-4">Add a Note</h2>
+
+    <form method="POST" class="space-y-3">
+      {{ form.hidden_tag() }}
+
+      {{ form.content(
+        class="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-500",
+        placeholder="Write something for your team..."
+      ) }}
+
+      <button type="submit"
+              class="btn btn-primary">
+        Add Note
+      </button>
+    </form>
+  </div>
+
+  <!-- Notes List -->
+  <div class="space-y-4">
+    {% if notes %}
+      {% for note in notes %}
+        <div class="card p-5">
+
+          <!-- Author + Timestamp -->
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <p class="font-semibold text-slate-900">
+                {{ note.author.name }}
+              </p>
+              <p class="text-sm text-slate-500">
+                {{ note.created_at.strftime("%d %b %Y • %H:%M") }}
+              </p>
+            </div>
+
+            {% if note.author_id == current_user.id %}
+            <form method="POST"
+                  action="{{ url_for('notes.delete_note', org_id=org.id, note_id=note.id) }}">
+              {{ form.hidden_tag() }}
+              <button type="submit"
+                      class="text-red-600 text-sm hover:underline">
+                Delete
+              </button>
+            </form>
+            {% endif %}
+          </div>
+
+          <!-- Note Content -->
+          <div class="text-slate-800 whitespace-pre-line">
+            {{ note.content }}
+          </div>
+
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="card p-6 text-center text-slate-500">
+        No notes yet. Be the first to add one.
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
