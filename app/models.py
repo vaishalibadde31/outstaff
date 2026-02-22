@@ -289,3 +289,16 @@ class Expense(TimestampMixin, db.Model):
 
     organization = db.relationship("Organization", backref=db.backref("expenses", lazy=True, cascade="all, delete-orphan"))
     user = db.relationship("User", backref=db.backref("expenses", lazy=True, cascade="all, delete-orphan"))
+
+class LeaveRequest(TimestampMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    org_id = db.Column(db.Integer, db.ForeignKey("organization.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    type = db.Column(db.String(50), nullable=False)  # Vacation, Sick, Other
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=False)
+    reason = db.Column(db.String(255), nullable=True)
+    status = db.Column(db.String(20), default="Pending", nullable=False)  # Pending, Approved, Rejected
+
+    organization = db.relationship("Organization", backref=db.backref("leave_requests", lazy=True, cascade="all, delete-orphan"))
+    user = db.relationship("User", backref=db.backref("leave_requests", lazy=True, cascade="all, delete-orphan"))

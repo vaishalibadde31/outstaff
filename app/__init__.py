@@ -25,6 +25,7 @@ def create_app():
     from app.time_entries.routes import time_bp
     from app.notes.routes import notes_bp
     from app.expenses.routes import expenses_bp
+    from app.leaves.routes import leaves_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(orgs_bp)
@@ -33,6 +34,8 @@ def create_app():
     app.register_blueprint(time_bp)
     app.register_blueprint(notes_bp)
     app.register_blueprint(expenses_bp)
+    app.register_blueprint(leaves_bp)
+    
 
     register_cli(app)
     register_context_processors(app)
