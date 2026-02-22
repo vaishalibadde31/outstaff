@@ -14,6 +14,7 @@
           Notes
         </a>
         <a class="btn btn-secondary" href="{{ url_for('orgs.directory', org_id=org.id) }}">Team Directory</a>
+        <a class="btn btn-secondary" href="{{ url_for('expenses.index', slug=org.slug) }}">Expense Tracker</a>
         {% if membership.role == Role.ADMIN %}
         <a class="btn btn-secondary" href="{{ url_for('admin.manage_members', org_id=org.id) }}">Admin console</a>
         <a class="btn btn-secondary" href="{{ url_for('orgs.edit_org', org_id=org.id) }}">Edit settings</a>
