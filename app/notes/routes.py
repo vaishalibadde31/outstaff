@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 from app.extensions import db
 from app.models import Note, Membership, Organization
 from app.forms import NoteForm
+from app.utils import log_activity
 
 notes_bp = Blueprint(
     "notes",
@@ -41,6 +42,7 @@ def notes_page(org_id):
 
         db.session.add(note)
         db.session.commit()
+        log_activity(org.id, current_user.id, "Added a team note.")
 
         flash("Note added successfully.", "success")
 
@@ -77,7 +79,7 @@ def delete_note(org_id, note_id):
 
     db.session.delete(note)
     db.session.commit()
-
+    log_activity(note.org_id, current_user.id, "Deleted a team note.")
     flash("Note deleted.", "info")
 
     return redirect(url_for("notes.notes_page", org_id=org_id))

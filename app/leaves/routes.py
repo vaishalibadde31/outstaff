@@ -3,6 +3,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from flask_login import login_required, current_user
 from app.extensions import db
 from app.models import LeaveRequest, Organization, Membership, Role
+from app.utils import log_activity
 
 leaves_bp = Blueprint("leaves", __name__)
 
@@ -43,6 +44,7 @@ def index(slug):
                     )
                     db.session.add(leave)
                     db.session.commit()
+                    log_activity(org.id, current_user.id, f"Submitted a leave request for {leave_type}")
                     flash("Leave request submitted successfully.", "success")
                     return redirect(url_for("leaves.index", slug=slug))
             except ValueError:
@@ -71,6 +73,7 @@ def update_status(id):
     if new_status in ["Approved", "Rejected"]:
         leave.status = new_status
         db.session.commit()
+        log_activity(org.id, current_user.id, f"{new_status} leave request for {leave.user.name}")
         flash(f"Leave request {new_status.lower()}.", "success")
     else:
         flash("Invalid status.", "error")

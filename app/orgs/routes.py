@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 
 from app.extensions import db
 from app.forms import OrganizationForm
-from app.models import Membership, Organization, Role
+from app.models import Membership, Organization, Role , ActivityLog
 
 orgs_bp = Blueprint("orgs", __name__)
 
@@ -129,3 +129,19 @@ def directory(org_id):
     members = members_query.order_by(Membership.user.property.mapper.class_.name).all()
 
     return render_template("orgs/members.html", org=org, members=members, query=query, Role=Role)
+
+
+@orgs_bp.route("/orgs/<slug>/activity")
+@login_required
+def activity(slug):
+    org = Organization.query.filter_by(slug=slug).first_or_404()
+    
+    # Check membership
+    membership = Membership.query.filter_by(user_id=current_user.id, org_id=org.id, status="active").first()
+    if not membership:
+        flash("You must be a member of this organization to view activity log.", "error")
+        return redirect(url_for("orgs.dashboard", slug=slug))
+
+    activities = ActivityLog.query.filter_by(org_id=org.id).order_by(ActivityLog.created_at.desc()).limit(50).all()
+    
+    return render_template("orgs/activity.html", org=org, activities=activities)

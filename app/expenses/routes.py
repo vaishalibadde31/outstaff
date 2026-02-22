@@ -3,6 +3,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 from app.extensions import db
 from app.models import Expense, Organization, Membership
+from app.utils import log_activity
 
 expenses_bp = Blueprint("expenses", __name__)
 
@@ -40,6 +41,7 @@ def index(slug):
                 )
                 db.session.add(expense)
                 db.session.commit()
+                log_activity(org.id, current_user.id, f"Added an expense: {description} (${amount})")
                 flash("Expense added successfully.", "success")
                 return redirect(url_for("expenses.index", slug=slug))
             except ValueError:

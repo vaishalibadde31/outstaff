@@ -302,3 +302,12 @@ class LeaveRequest(TimestampMixin, db.Model):
 
     organization = db.relationship("Organization", backref=db.backref("leave_requests", lazy=True, cascade="all, delete-orphan"))
     user = db.relationship("User", backref=db.backref("leave_requests", lazy=True, cascade="all, delete-orphan"))
+
+class ActivityLog(TimestampMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    org_id = db.Column(db.Integer, db.ForeignKey("organization.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    action = db.Column(db.String(255), nullable=False)
+
+    organization = db.relationship("Organization", backref=db.backref("activity_logs", lazy=True, cascade="all, delete-orphan"))
+    user = db.relationship("User", backref=db.backref("activity_logs", lazy=True, cascade="all, delete-orphan"))
