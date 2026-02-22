@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900">Team Directory</h1>
+            <p class="text-slate-600">All members of {{ org.name }}</p>
+        </div>
+        <a href="{{ url_for('orgs.view_org', org_id=org.id) }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+
+    <!-- Search Form -->
+    <div class="card p-6">
+        <form method="GET" action="{{ url_for('orgs.directory', org_id=org.id) }}" class="flex gap-4">
+            <div class="flex-grow">
+                <label for="q" class="sr-only">Search members</label>
+                <input type="text" name="q" id="q" value="{{ query }}" placeholder="Search by name or email..."
+                    class="form-input w-full">
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+            {% if query %}
+            <a href="{{ url_for('orgs.directory', org_id=org.id) }}" class="btn btn-secondary">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Members List -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for member in members %}
+        <div
+            class="card p-6 flex items-start gap-4 {% if member.role == Role.ADMIN %}border-brand-200 bg-brand-50/30{% endif %}">
+            <div
+                class="h-12 w-12 rounded-full bg-slate-200 flex items-center justify-center text-xl font-bold text-slate-600 uppercase flex-shrink-0">
+                {{ member.user.name[:2] }}
+            </div>
+            <div class="flex-grow min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                    <h3 class="font-semibold text-slate-900 truncate" title="{{ member.user.name }}">{{ member.user.name
+                        }}</h3>
+                    {% if member.role == Role.ADMIN %}
+                    <span class="badge bg-brand-100 text-brand-700">Admin</span>
+                    {% else %}
+                    <span class="badge bg-slate-100 text-slate-600">Member</span>
+                    {% endif %}
+                </div>
+                <p class="text-sm text-slate-500 truncate" title="{{ member.user.email }}">{{ member.user.email }}</p>
+                <p class="text-xs text-slate-400 mt-2">Joined {{ member.created_at.strftime('%b %Y') }}</p>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-span-full text-center py-12 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+            <p class="text-slate-500">No members found matching "{{ query }}".</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -103,3 +103,29 @@ def set_default_org(org_id):
     db.session.commit()
     flash("Default organization updated.", "success")
     return redirect(request.referrer or url_for("orgs.list_orgs"))
+
+
+@orgs_bp.route("/orgs/<int:org_id>/members")
+@login_required
+def directory(org_id):
+    membership = _user_membership(org_id)
+    if not membership:
+        abort(403)
+    
+    org = membership.organization
+    query = request.args.get("q", "").strip()
+
+    members_query = Membership.query.join(Membership.user).filter(
+        Membership.org_id == org.id,
+        Membership.status == "active"
+    )
+
+    if query:
+        # Case-insensitive search on User name or Email
+        from app.models import User
+        members_query = members_query.filter(
+            (User.name.ilike(f"%{query}%")) | (User.email.ilike(f"%{query}%"))
+        )
+    members = members_query.order_by(Membership.user.property.mapper.class_.name).all()
+
+    return render_template("orgs/members.html", org=org, members=members, query=query, Role=Role)
